@@ -27,21 +27,19 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-zinc-50 px-4 dark:bg-black">
+    <div className="flex flex-1 items-center justify-center px-4" style={{ background: 'var(--plib-bg)' }}>
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-2xl border border-black/[.08] bg-white p-8 shadow-sm dark:border-white/[.145] dark:bg-zinc-950"
+        className="w-full max-w-sm rounded-[10px] border border-(--plib-border-soft) p-8"
+        style={{ background: 'var(--plib-surface)', boxShadow: '0 2px 6px oklch(0.4 0.05 55 / 0.06)' }}
       >
-        <h1 className="mb-6 text-center text-2xl font-semibold text-black dark:text-zinc-50">
+        <h1 className="plib-serif mb-6 text-center text-2xl font-bold" style={{ color: 'var(--plib-text)' }}>
           เข้าสู่ระบบ
         </h1>
 
         <div className="flex flex-col gap-4">
           <div>
-            <label
-              htmlFor="username"
-              className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
+            <label htmlFor="username" className="mb-1 block text-sm font-medium" style={{ color: 'var(--plib-text-muted)' }}>
               Username
             </label>
             <input
@@ -52,15 +50,13 @@ export default function LoginPage() {
               onChange={(event) => setUsername(event.target.value)}
               required
               autoComplete="username"
-              className="w-full rounded-lg border border-black/[.08] bg-transparent px-3 py-2 text-sm text-black outline-none focus:ring-2 focus:ring-black/20 dark:border-white/[.145] dark:text-zinc-50 dark:focus:ring-white/20"
+              className="w-full rounded-lg border border-(--plib-border) bg-transparent px-3 py-2 text-sm outline-none"
+              style={{ color: 'var(--plib-text)' }}
             />
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
+            <label htmlFor="password" className="mb-1 block text-sm font-medium" style={{ color: 'var(--plib-text-muted)' }}>
               Password
             </label>
             <input
@@ -71,12 +67,13 @@ export default function LoginPage() {
               onChange={(event) => setPassword(event.target.value)}
               required
               autoComplete="current-password"
-              className="w-full rounded-lg border border-black/[.08] bg-transparent px-3 py-2 text-sm text-black outline-none focus:ring-2 focus:ring-black/20 dark:border-white/[.145] dark:text-zinc-50 dark:focus:ring-white/20"
+              className="w-full rounded-lg border border-(--plib-border) bg-transparent px-3 py-2 text-sm outline-none"
+              style={{ color: 'var(--plib-text)' }}
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+            <p className="text-sm" style={{ color: 'oklch(0.55 0.18 25)' }} role="alert">
               {error}
             </p>
           )}
@@ -84,7 +81,8 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 flex h-11 w-full items-center justify-center rounded-full bg-foreground font-medium text-background transition-colors hover:bg-[#383838] disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-[#ccc]"
+            className="mt-2 flex h-11 w-full items-center justify-center rounded-lg text-sm font-semibold transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+            style={{ background: 'var(--plib-accent)', color: 'var(--plib-accent-contrast)' }}
           >
             {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
           </button>

@@ -25,8 +25,8 @@ export default function ProtectedRoute({ children }) {
 
   if (!authed) {
     return (
-      <div className="flex flex-1 items-center justify-center">
-        <p className="text-zinc-500 dark:text-zinc-400">กรุณาเข้าสู่ระบบก่อนใช้งาน...</p>
+      <div className="flex flex-1 items-center justify-center" style={{ background: 'var(--plib-bg)' }}>
+        <p style={{ color: 'var(--plib-text-muted)' }}>กรุณาเข้าสู่ระบบก่อนใช้งาน...</p>
       </div>
     );
   }

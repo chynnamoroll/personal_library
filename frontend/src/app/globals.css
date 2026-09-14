@@ -1,26 +1,44 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --plib-bg: oklch(0.98 0.008 75);
+  --plib-surface: oklch(1 0 0);
+  --plib-border: oklch(0.88 0.02 65);
+  --plib-border-soft: oklch(0.89 0.018 65);
+  --plib-text: oklch(0.28 0.03 50);
+  --plib-text-muted: oklch(0.5 0.03 55);
+  --plib-accent: oklch(0.5 0.12 55);
+  --plib-accent-contrast: oklch(1 0 0);
+  --plib-avatar-bg: oklch(0.94 0.03 60);
+  --plib-fold: oklch(0.91 0.035 62);
+  --plib-stamp-bg: oklch(0.98 0.012 68);
+  --plib-stamp-border: oklch(0.5 0.1 55 / 0.55);
+  --plib-skel-base: oklch(0.94 0.008 75);
+  --plib-skel-highlight: oklch(0.98 0.005 75);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-serif-thai: var(--font-serif-thai);
+  --font-sarabun: var(--font-sarabun);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--plib-bg);
+  color: var(--plib-text);
+  font-family: var(--font-sarabun), system-ui, sans-serif;
+}
+
+.plib-serif {
+  font-family: var(--font-serif-thai), serif;
+}
+
+@keyframes plib-shimmer {
+  0% { background-position: -220px 0; }
+  100% { background-position: 220px 0; }
+}
+
+.plib-skeleton {
+  background: linear-gradient(90deg, var(--plib-skel-base) 25%, var(--plib-skel-highlight) 37%, var(--plib-skel-base) 63%);
+  background-size: 420px 100%;
+  animation: plib-shimmer 1.6s ease-in-out infinite;
 }
