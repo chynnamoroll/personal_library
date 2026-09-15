@@ -6,25 +6,21 @@ import Navbar from '@/components/Navbar';
 import BookCard from '@/components/BookCard';
 import BookCardSkeleton from '@/components/BookCardSkeleton';
 import AddBookModal from '@/components/AddBookModal';
+import Select from '@/components/Select';
 import { getBooks, deleteBook } from '@/services/bookService';
 import { getCategories } from '@/services/categoryService';
 import { getAuthors } from '@/services/authorService';
 
 function FilterSelect({ label, value, onChange, options }) {
   return (
-    <select
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-      className="rounded-lg border border-(--plib-border) px-4 py-2.5 text-[13.5px] font-medium outline-none"
-      style={{ background: 'var(--plib-surface)', color: 'var(--plib-text)' }}
-    >
+    <Select value={value} onChange={(event) => onChange(event.target.value)} className="min-w-[160px]">
       <option value="">{label}: ทั้งหมด</option>
       {options.map((option) => (
         <option key={option.id} value={option.id}>
           {option.name}
         </option>
       ))}
-    </select>
+    </Select>
   );
 }
 
@@ -102,8 +98,7 @@ function HomeContent() {
           <button
             type="button"
             onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center gap-2 rounded-lg px-5 py-2.5 text-[13.5px] font-semibold"
-            style={{ background: 'var(--plib-accent)', color: 'var(--plib-accent-contrast)' }}
+            className="plib-btn-primary flex cursor-pointer items-center gap-2 rounded-lg px-5 py-2.5 text-[13.5px] font-semibold"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
               <path d="M12 5v14M5 12h14" />

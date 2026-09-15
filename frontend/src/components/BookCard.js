@@ -1,11 +1,8 @@
 export default function BookCard({ title, author, category, onDelete }) {
   return (
     <div
-      className="relative flex flex-col gap-4 overflow-hidden rounded-[10px] border border-(--plib-border-soft) p-5"
-      style={{
-        background: 'var(--plib-surface)',
-        boxShadow: '0 2px 6px oklch(0.4 0.05 55 / 0.06)',
-      }}
+      className="plib-card relative flex flex-col gap-4 overflow-hidden rounded-[10px] border border-(--plib-border-soft) p-5"
+      style={{ background: 'var(--plib-surface)' }}
     >
       <div
         className="absolute right-0 top-0 h-0 w-0"
@@ -23,7 +20,7 @@ export default function BookCard({ title, author, category, onDelete }) {
           type="button"
           aria-label="ลบหนังสือ"
           onClick={onDelete}
-          className="flex h-[30px] w-[30px] items-center justify-center rounded-lg"
+          className="plib-icon-btn flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-lg"
           style={{ color: 'var(--plib-text-muted)' }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

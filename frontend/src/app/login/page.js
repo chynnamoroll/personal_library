@@ -50,7 +50,7 @@ export default function LoginPage() {
               onChange={(event) => setUsername(event.target.value)}
               required
               autoComplete="username"
-              className="w-full rounded-lg border border-(--plib-border) bg-transparent px-3 py-2 text-sm outline-none"
+              className="plib-input w-full rounded-lg border border-(--plib-border) bg-transparent px-3 py-2 text-sm outline-none"
               style={{ color: 'var(--plib-text)' }}
             />
           </div>
@@ -67,7 +67,7 @@ export default function LoginPage() {
               onChange={(event) => setPassword(event.target.value)}
               required
               autoComplete="current-password"
-              className="w-full rounded-lg border border-(--plib-border) bg-transparent px-3 py-2 text-sm outline-none"
+              className="plib-input w-full rounded-lg border border-(--plib-border) bg-transparent px-3 py-2 text-sm outline-none"
               style={{ color: 'var(--plib-text)' }}
             />
           </div>
@@ -81,8 +81,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 flex h-11 w-full items-center justify-center rounded-lg text-sm font-semibold transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
-            style={{ background: 'var(--plib-accent)', color: 'var(--plib-accent-contrast)' }}
+            className="plib-btn-primary mt-2 flex h-11 w-full cursor-pointer items-center justify-center rounded-lg text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
           </button>

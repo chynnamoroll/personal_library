@@ -50,7 +50,7 @@ export default function Navbar() {
         <button
           type="button"
           onClick={handleLogout}
-          className="rounded-lg border border-(--plib-border) px-[18px] py-[9px] text-[13.5px] font-semibold"
+          className="plib-btn-outline cursor-pointer rounded-lg border border-(--plib-border) px-[18px] py-[9px] text-[13.5px] font-semibold"
           style={{ color: 'var(--plib-text-muted)' }}
         >
           ออกจากระบบ

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createBook } from '@/services/bookService';
+import Select from '@/components/Select';
 
 const STATUS_OPTIONS = [
   { value: 'unread', label: 'ยังไม่ได้อ่าน' },
@@ -21,6 +22,17 @@ export default function AddBookModal({ categories, authors, onClose, onCreated }
   function toggleAuthor(id) {
     setAuthorIds((prev) => (prev.includes(id) ? prev.filter((authorId) => authorId !== id) : [...prev, id]));
   }
+
+  useEffect(() => {
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -49,14 +61,14 @@ export default function AddBookModal({ categories, authors, onClose, onCreated }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-4"
+      className="plib-modal-backdrop fixed inset-0 z-50 flex items-center justify-center px-4"
       style={{ background: 'oklch(0.2 0.02 260 / 0.4)' }}
       onClick={onClose}
     >
       <form
         onClick={(event) => event.stopPropagation()}
         onSubmit={handleSubmit}
-        className="w-full max-w-md rounded-[10px] border border-(--plib-border-soft) p-6"
+        className="plib-modal-panel w-full max-w-md rounded-[10px] border border-(--plib-border-soft) p-6"
         style={{ background: 'var(--plib-surface)' }}
       >
         <h2 className="plib-serif mb-5 text-xl font-bold" style={{ color: 'var(--plib-text)' }}>
@@ -73,7 +85,7 @@ export default function AddBookModal({ categories, authors, onClose, onCreated }
               type="text"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              className="w-full rounded-lg border border-(--plib-border) bg-transparent px-3 py-2 text-sm outline-none"
+              className="plib-input w-full rounded-lg border border-(--plib-border) bg-transparent px-3 py-2 text-sm outline-none"
               style={{ color: 'var(--plib-text)' }}
             />
           </div>
@@ -82,29 +94,27 @@ export default function AddBookModal({ categories, authors, onClose, onCreated }
             <label htmlFor="new-book-category" className="mb-1 block text-sm font-medium" style={{ color: 'var(--plib-text-muted)' }}>
               หมวดหมู่
             </label>
-            <select
-              id="new-book-category"
-              value={categoryId}
-              onChange={(event) => setCategoryId(event.target.value)}
-              className="w-full rounded-lg border border-(--plib-border) bg-transparent px-3 py-2 text-sm outline-none"
-              style={{ color: 'var(--plib-text)' }}
-            >
+            <Select id="new-book-category" value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
               <option value="">เลือกหมวดหมู่</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div>
             <span className="mb-1 block text-sm font-medium" style={{ color: 'var(--plib-text-muted)' }}>
               ผู้แต่ง (เลือกได้มากกว่า 1 คน)
             </span>
-            <div className="flex max-h-32 flex-col gap-1 overflow-y-auto rounded-lg border border-(--plib-border) p-2">
+            <div className="flex max-h-32 flex-col gap-0.5 overflow-y-auto rounded-lg border border-(--plib-border) p-2">
               {authors.map((author) => (
-                <label key={author.id} className="flex items-center gap-2 text-sm" style={{ color: 'var(--plib-text)' }}>
+                <label
+                  key={author.id}
+                  className="plib-checkbox-row flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm"
+                  style={{ color: 'var(--plib-text)' }}
+                >
                   <input
                     type="checkbox"
                     checked={authorIds.includes(String(author.id))}
@@ -120,19 +130,13 @@ export default function AddBookModal({ categories, authors, onClose, onCreated }
             <label htmlFor="new-book-status" className="mb-1 block text-sm font-medium" style={{ color: 'var(--plib-text-muted)' }}>
               สถานะ
             </label>
-            <select
-              id="new-book-status"
-              value={status}
-              onChange={(event) => setStatus(event.target.value)}
-              className="w-full rounded-lg border border-(--plib-border) bg-transparent px-3 py-2 text-sm outline-none"
-              style={{ color: 'var(--plib-text)' }}
-            >
+            <Select id="new-book-status" value={status} onChange={(event) => setStatus(event.target.value)}>
               {STATUS_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           {error && (
@@ -145,7 +149,7 @@ export default function AddBookModal({ categories, authors, onClose, onCreated }
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-(--plib-border) px-4 py-2 text-sm font-semibold"
+              className="plib-btn-outline cursor-pointer rounded-lg border border-(--plib-border) px-4 py-2 text-sm font-semibold"
               style={{ color: 'var(--plib-text-muted)' }}
             >
               ยกเลิก
@@ -153,8 +157,7 @@ export default function AddBookModal({ categories, authors, onClose, onCreated }
             <button
               type="submit"
               disabled={submitting}
-              className="rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50"
-              style={{ background: 'var(--plib-accent)', color: 'var(--plib-accent-contrast)' }}
+              className="plib-btn-primary cursor-pointer rounded-lg px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
             >
               {submitting ? 'กำลังบันทึก...' : 'บันทึก'}
             </button>

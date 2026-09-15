@@ -15,6 +15,7 @@
   --plib-stamp-border: oklch(0.5 0.1 55 / 0.55);
   --plib-skel-base: oklch(0.94 0.008 75);
   --plib-skel-highlight: oklch(0.98 0.005 75);
+  --plib-accent-hover: oklch(0.44 0.12 55);
 }
 
 @theme inline {
@@ -41,4 +42,93 @@ body {
   background: linear-gradient(90deg, var(--plib-skel-base) 25%, var(--plib-skel-highlight) 37%, var(--plib-skel-base) 63%);
   background-size: 420px 100%;
   animation: plib-shimmer 1.6s ease-in-out infinite;
+}
+
+:focus-visible {
+  outline: 2px solid var(--plib-accent);
+  outline-offset: 2px;
+}
+
+input[type='checkbox'] {
+  accent-color: var(--plib-accent);
+}
+
+.plib-card {
+  box-shadow: 0 2px 6px oklch(0.4 0.05 55 / 0.06);
+  transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+}
+
+.plib-card:hover {
+  box-shadow: 0 10px 22px oklch(0.4 0.08 53 / 0.14);
+  transform: translateY(-3px);
+  border-color: var(--plib-accent);
+}
+
+.plib-icon-btn {
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.plib-icon-btn:hover {
+  background: oklch(0.55 0.18 25 / 0.12);
+  color: oklch(0.5 0.16 25);
+}
+
+.plib-btn-primary {
+  background: var(--plib-accent);
+  color: var(--plib-accent-contrast);
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.plib-btn-primary:hover:not(:disabled) {
+  background: var(--plib-accent-hover);
+}
+
+.plib-btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.plib-btn-outline {
+  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+
+.plib-btn-outline:hover {
+  background: var(--plib-bg);
+  border-color: var(--plib-accent);
+  color: var(--plib-text);
+}
+
+.plib-input,
+.plib-select-native {
+  transition: border-color 150ms ease;
+}
+
+.plib-input:hover,
+.plib-select-native:hover {
+  border-color: var(--plib-accent);
+}
+
+.plib-checkbox-row {
+  transition: background-color 150ms ease;
+}
+
+.plib-checkbox-row:hover {
+  background: var(--plib-bg);
+}
+
+@keyframes plib-modal-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes plib-modal-panel-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.plib-modal-backdrop {
+  animation: plib-modal-backdrop-in 150ms ease-out;
+}
+
+.plib-modal-panel {
+  animation: plib-modal-panel-in 180ms ease-out;
 }
