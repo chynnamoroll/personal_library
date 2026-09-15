@@ -1,4 +1,6 @@
 exports.seed = async function seed(knex) {
+  await knex('book_authors').del();
+  await knex('books').del();
   await knex('categories').del();
 
   await knex('categories').insert([
@@ -6,5 +8,7 @@ exports.seed = async function seed(knex) {
     { name: 'สารคดี', description: 'เรื่องราวจากเหตุการณ์หรือชีวิตจริง' },
     { name: 'วรรณกรรมเยาวชน', description: 'หนังสือสำหรับผู้อ่านวัยเยาวชน' },
     { name: 'ธรรมะ', description: 'หนังสือธรรมะและปรัชญาชีวิต' },
+    { name: 'บทกวี', description: 'รวมบทกวีและวรรณกรรมร้อยกรอง' },
+    { name: 'ประวัติศาสตร์', description: 'เรื่องราวและเหตุการณ์ทางประวัติศาสตร์' },
   ]);
 };

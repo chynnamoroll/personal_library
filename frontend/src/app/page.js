@@ -113,9 +113,9 @@ function HomeContent() {
           </p>
         )}
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {loading
-            ? Array.from({ length: 6 }).map((_, index) => <BookCardSkeleton key={index} />)
+            ? Array.from({ length: 10 }).map((_, index) => <BookCardSkeleton key={index} />)
             : books.map((book) => (
                 <BookCard
                   key={book.id}
