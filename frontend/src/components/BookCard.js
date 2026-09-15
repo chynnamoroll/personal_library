@@ -1,4 +1,4 @@
-export default function BookCard({ title, author, category }) {
+export default function BookCard({ title, author, category, onDelete }) {
   return (
     <div
       className="relative flex flex-col gap-4 overflow-hidden rounded-[10px] border border-(--plib-border-soft) p-5"
@@ -22,6 +22,7 @@ export default function BookCard({ title, author, category }) {
         <button
           type="button"
           aria-label="ลบหนังสือ"
+          onClick={onDelete}
           className="flex h-[30px] w-[30px] items-center justify-center rounded-lg"
           style={{ color: 'var(--plib-text-muted)' }}
         >

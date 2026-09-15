@@ -26,7 +26,12 @@ export async function apiFetch(path, options = {}) {
   });
 
   if (response.status === 401) {
+    const hadToken = Boolean(token);
     clearToken();
+    if (hadToken && typeof window !== 'undefined') {
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- this module has no router (called outside React), and a hard reload is intentional to fully clear state after an invalidated session
+      window.location.assign('/login');
+    }
   }
 
   const data = await response.json().catch(() => null);

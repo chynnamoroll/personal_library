@@ -1,32 +1,86 @@
 'use client';
 
+import { useCallback, useEffect, useState } from 'react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Navbar from '@/components/Navbar';
 import BookCard from '@/components/BookCard';
 import BookCardSkeleton from '@/components/BookCardSkeleton';
+import AddBookModal from '@/components/AddBookModal';
+import { getBooks, deleteBook } from '@/services/bookService';
+import { getCategories } from '@/services/categoryService';
+import { getAuthors } from '@/services/authorService';
 
-const placeholderBooks = [
-  { id: 1, title: 'แดนสมมุติ', author: 'วินทร์ เลียววาริณ', category: 'วรรณกรรม' },
-  { id: 2, title: 'เชิงตะกอน', author: 'เสกสรรค์ ประเสริฐกุล', category: 'สารคดี' },
-  { id: 3, title: 'ความสุขของกะทิ', author: 'งามพรรณ เวชชาชีวะ', category: 'วรรณกรรมเยาวชน' },
-  { id: 4, title: 'คู่มือมนุษย์', author: 'พุทธทาสภิกขุ', category: 'ธรรมะ' },
-];
-
-function FilterDropdown({ label }) {
+function FilterSelect({ label, value, onChange, options }) {
   return (
-    <div
-      className="flex items-center gap-2.5 rounded-lg border border-(--plib-border) px-4 py-2.5 text-[13.5px] font-medium"
+    <select
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      className="rounded-lg border border-(--plib-border) px-4 py-2.5 text-[13.5px] font-medium outline-none"
       style={{ background: 'var(--plib-surface)', color: 'var(--plib-text)' }}
     >
-      <span>{label}</span>
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--plib-text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6 9l6 6 6-6" />
-      </svg>
-    </div>
+      <option value="">{label}: ทั้งหมด</option>
+      {options.map((option) => (
+        <option key={option.id} value={option.id}>
+          {option.name}
+        </option>
+      ))}
+    </select>
   );
 }
 
 function HomeContent() {
+  const [books, setBooks] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [authors, setAuthors] = useState([]);
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [authorFilter, setAuthorFilter] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  const loadBooks = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const data = await getBooks({
+        categoryId: categoryFilter || undefined,
+        authorId: authorFilter || undefined,
+      });
+      setBooks(data);
+    } catch (err) {
+      setError(err.message || 'โหลดรายการหนังสือไม่สำเร็จ');
+    } finally {
+      setLoading(false);
+    }
+  }, [categoryFilter, authorFilter]);
+
+  useEffect(() => {
+    getCategories().then(setCategories).catch(() => {});
+    getAuthors().then(setAuthors).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetching books on mount/filter change has no non-effect equivalent without a data-fetching library
+    loadBooks();
+  }, [loadBooks]);
+
+  async function handleDelete(id) {
+    const previousBooks = books;
+    setBooks((current) => current.filter((book) => book.id !== id));
+
+    try {
+      await deleteBook(id);
+    } catch (err) {
+      setBooks(previousBooks);
+      setError(err.message || 'ลบหนังสือไม่สำเร็จ');
+    }
+  }
+
+  function handleCreated(newBook) {
+    setBooks((current) => [newBook, ...current]);
+    setIsAddModalOpen(false);
+  }
+
   return (
     <>
       <Navbar />
@@ -36,17 +90,18 @@ function HomeContent() {
             หนังสือทั้งหมด
           </h1>
           <span className="text-[13.5px]" style={{ color: 'var(--plib-text-muted)' }}>
-            ทั้งหมด {placeholderBooks.length} เล่มในคลังของคุณ
+            ทั้งหมด {books.length} เล่มในคลังของคุณ
           </span>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
-            <FilterDropdown label="หมวดหมู่: ทั้งหมด" />
-            <FilterDropdown label="ผู้แต่ง: ทั้งหมด" />
+            <FilterSelect label="หมวดหมู่" value={categoryFilter} onChange={setCategoryFilter} options={categories} />
+            <FilterSelect label="ผู้แต่ง" value={authorFilter} onChange={setAuthorFilter} options={authors} />
           </div>
           <button
             type="button"
+            onClick={() => setIsAddModalOpen(true)}
             className="flex items-center gap-2 rounded-lg px-5 py-2.5 text-[13.5px] font-semibold"
             style={{ background: 'var(--plib-accent)', color: 'var(--plib-accent-contrast)' }}
           >
@@ -57,14 +112,41 @@ function HomeContent() {
           </button>
         </div>
 
+        {error && (
+          <p className="text-sm" style={{ color: 'oklch(0.55 0.18 25)' }} role="alert">
+            {error}
+          </p>
+        )}
+
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {placeholderBooks.map((book) => (
-            <BookCard key={book.id} title={book.title} author={book.author} category={book.category} />
-          ))}
-          <BookCardSkeleton />
-          <BookCardSkeleton />
+          {loading
+            ? Array.from({ length: 6 }).map((_, index) => <BookCardSkeleton key={index} />)
+            : books.map((book) => (
+                <BookCard
+                  key={book.id}
+                  title={book.title}
+                  author={book.authors?.map((author) => author.name).join(', ') || 'ไม่ระบุผู้แต่ง'}
+                  category={book.category_name || 'ไม่ระบุหมวดหมู่'}
+                  onDelete={() => handleDelete(book.id)}
+                />
+              ))}
         </div>
+
+        {!loading && books.length === 0 && !error && (
+          <p className="text-sm" style={{ color: 'var(--plib-text-muted)' }}>
+            ยังไม่มีหนังสือในคลัง ลองเพิ่มเล่มแรกดูสิ
+          </p>
+        )}
       </main>
+
+      {isAddModalOpen && (
+        <AddBookModal
+          categories={categories}
+          authors={authors}
+          onClose={() => setIsAddModalOpen(false)}
+          onCreated={handleCreated}
+        />
+      )}
     </>
   );
 }
