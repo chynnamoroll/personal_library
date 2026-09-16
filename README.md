@@ -125,6 +125,32 @@ docker compose up -d --build
 - ปรับค่า credential/secret ได้โดย copy `.env.example` เป็น `.env` ที่ root แล้วแก้ค่า (ไม่จำเป็นต้องทำ มี default ให้พร้อมใช้)
 - หยุดการทำงาน: `docker compose down` (ข้อมูลใน DB ยังอยู่ เพราะเก็บใน named volume) หรือ `docker compose down -v` ถ้าต้องการล้างข้อมูลด้วย
 
+## Deploy จริง (ทางเลือก)
+
+Frontend และ Backend deploy แยกที่กันคนละที่ เพราะ Vercel เหมาะกับ frontend/serverless ไม่เหมาะกับ Express server แบบ long-running:
+
+### Backend + Database → Render
+
+มี `render.yaml` (Blueprint) ให้พร้อมใช้ที่ root ของ repo — สร้าง Web Service + PostgreSQL ให้อัตโนมัติในคลิกเดียว:
+
+1. ไปที่ [Render Dashboard](https://dashboard.render.com) → **New** → **Blueprint** → เชื่อม repo นี้
+2. Render จะอ่าน `render.yaml` แล้วสร้าง Web Service (`personal-library-backend`) + PostgreSQL (`personal-library-db`) ให้เอง พร้อมต่อ `DATABASE_URL` และสุ่ม `JWT_SECRET` ให้อัตโนมัติ
+3. รอ deploy เสร็จ (migration รันอัตโนมัติตอน start) แล้ว copy URL ของ backend (รูปแบบ `https://personal-library-backend-xxxx.onrender.com`)
+4. รัน seed ครั้งแรกผ่าน Render Shell (Dashboard → service → **Shell**):
+   ```bash
+   npm run seed
+   ```
+
+**ข้อควรรู้**: PostgreSQL แบบ free ของ Render จะหมดอายุใน 30 วันหลังสร้าง (มี grace period ต่ออีก 14 วันก่อนลบข้อมูลจริง) และ Web Service แบบ free จะ sleep หลังไม่มีการใช้งาน 15 นาที คำขอแรกหลัง sleep จะช้ากว่าปกติ (~30-50 วินาที) — เหมาะสำหรับ demo/ตรวจงาน ไม่เหมาะสำหรับ production จริง
+
+ถ้าไม่ใช้ Blueprint ก็สร้างเองผ่าน Dashboard ได้เช่นกัน (New PostgreSQL → New Web Service ชี้ไปที่โฟลเดอร์ `backend/`) แล้วตั้งค่า `DATABASE_URL` เป็น connection string ที่ได้จาก database, ตั้ง `JWT_SECRET`/`JWT_EXPIRES_IN` เอง
+
+### Frontend → Vercel
+
+1. Import repo เข้า Vercel แล้วตั้งค่า **Root Directory** เป็น `frontend`
+2. เพิ่ม Environment Variable `NEXT_PUBLIC_API_URL` เป็น URL ของ backend ที่ deploy ไว้บน Render (ข้อสำคัญ: ต้องตั้งค่านี้**ก่อน** build เพราะ Next.js จะฝังค่านี้ลงใน client bundle ตอน build — ถ้าตั้งค่าทีหลังต้อง redeploy ใหม่ให้ build รอบใหม่)
+3. Deploy ตามปกติ — `next.config.mjs` ตรวจ env `VERCEL` ให้อัตโนมัติเพื่อปิด `output: 'standalone'` (ใช้เฉพาะตอน build สำหรับ Docker) เพื่อไม่ให้ชนกับ build process ของ Vercel
+
 ## Username / Password สำหรับทดสอบ Login
 
 ```
