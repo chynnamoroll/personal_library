@@ -2,7 +2,7 @@
 const nextConfig = {
   /* config options here */
   reactCompiler: true,
-  output: 'standalone',
+  ...(process.env.VERCEL ? {} : { output: 'standalone' }),
 };
 
 export default nextConfig;
