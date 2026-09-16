@@ -1,0 +1,135 @@
+### Personal Book Library — API collection
+###
+### วิธีใช้: เปิดไฟล์นี้ใน VS Code พร้อมติดตั้ง extension "REST Client"
+### (humao.rest-client) แล้วกด "Send Request" เหนือแต่ละ ### บล็อก
+### ลำดับการยิง: รัน "Login" ก่อน 1 ครั้ง ตัวแปร {{login.response.body.token}}
+### จะถูกใช้อัตโนมัติในคำขอที่ต้อง Bearer token ต่อจากนั้น
+###
+### ถ้าไม่มี REST Client ให้ copy คำสั่ง curl ในคอมเมนต์ท้ายไฟล์ไปรันแทนได้เลย
+
+@baseUrl = http://localhost:3030
+
+### 1. Login (ใช้ username/password จาก seed: admin / admin123)
+# @name login
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+### 2. Login ด้วยรหัสผ่านผิด (คาดหวัง 401)
+POST {{baseUrl}}/api/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "wrong-password"
+}
+
+### 3. รายการหนังสือทั้งหมด
+GET {{baseUrl}}/api/books
+
+### 4. รายการหนังสือ กรองตามหมวดหมู่ (categoryId=1)
+GET {{baseUrl}}/api/books?categoryId=1
+
+### 5. รายการหนังสือ กรองตามผู้แต่ง (authorId=1)
+GET {{baseUrl}}/api/books?authorId=1
+
+### 6. หนังสือทั้งหมดของหมวดหมู่+ผู้แต่งที่ระบุพร้อมกัน
+GET {{baseUrl}}/api/books?categoryId=1&authorId=1
+
+### 7. หนังสือเล่มเดียว — แก้ {{bookId}} เป็น id จริงจากผลลัพธ์ข้อ 3 ก่อนยิง
+@bookId = REPLACE_WITH_REAL_BOOK_ID
+GET {{baseUrl}}/api/books/{{bookId}}
+
+### 8. หนังสือที่ไม่มีอยู่จริง (คาดหวัง 404)
+GET {{baseUrl}}/api/books/00000000-0000-0000-0000-000000000000
+
+### 9. รายชื่อผู้แต่งทั้งหมด (สำหรับ dropdown ฝั่ง frontend)
+GET {{baseUrl}}/api/authors
+
+### 10. รายชื่อหมวดหมู่ทั้งหมด (สำหรับ dropdown ฝั่ง frontend)
+GET {{baseUrl}}/api/categories
+
+### 11. สร้างหนังสือใหม่ "โดยไม่มี" token (คาดหวัง 401)
+POST {{baseUrl}}/api/books
+Content-Type: application/json
+
+{
+  "title": "ไม่ควรสร้างได้เพราะไม่มี token",
+  "categoryId": 1,
+  "authorIds": [1]
+}
+
+### 12. สร้างหนังสือใหม่ ด้วย categoryId ที่ไม่มีอยู่จริง (คาดหวัง 400)
+POST {{baseUrl}}/api/books
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "title": "หมวดหมู่ไม่มีอยู่จริง",
+  "categoryId": 999999,
+  "authorIds": [1]
+}
+
+### 13. สร้างหนังสือใหม่ สำเร็จ (201) — มีผู้แต่งหลายคนได้
+# @name createBook
+POST {{baseUrl}}/api/books
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "title": "หนังสือทดสอบจาก API collection",
+  "categoryId": 1,
+  "authorIds": [1, 2],
+  "status": "unread"
+}
+
+### 14. ลบหนังสือที่เพิ่งสร้างในข้อ 13 (204)
+DELETE {{baseUrl}}/api/books/{{createBook.response.body.id}}
+Authorization: Bearer {{login.response.body.token}}
+
+### 15. ลบหนังสือ "โดยไม่มี" token (คาดหวัง 401)
+DELETE {{baseUrl}}/api/books/{{createBook.response.body.id}}
+
+### 16. ลบหนังสือที่ลบไปแล้ว/ไม่มีอยู่จริง (คาดหวัง 404)
+DELETE {{baseUrl}}/api/books/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{login.response.body.token}}
+
+
+### ---------------------------------------------------------------
+### เทียบเท่าแบบ curl (กรณีไม่ได้ใช้ VS Code / REST Client)
+### ---------------------------------------------------------------
+#
+# login:
+#   curl -s -X POST http://localhost:3030/api/login \
+#     -H "Content-Type: application/json" \
+#     -d '{"username":"admin","password":"admin123"}'
+#
+# เก็บ token ไว้ในตัวแปร (bash/zsh):
+#   TOKEN=$(curl -s -X POST http://localhost:3030/api/login \
+#     -H "Content-Type: application/json" \
+#     -d '{"username":"admin","password":"admin123"}' | python3 -c "import json,sys;print(json.load(sys.stdin)['token'])")
+#
+# รายการหนังสือ:
+#   curl -s http://localhost:3030/api/books
+#   curl -s "http://localhost:3030/api/books?categoryId=1"
+#
+# หนังสือเล่มเดียว:
+#   curl -s http://localhost:3030/api/books/<book-id>
+#
+# ผู้แต่ง / หมวดหมู่:
+#   curl -s http://localhost:3030/api/authors
+#   curl -s http://localhost:3030/api/categories
+#
+# สร้างหนังสือ (ต้องมี token):
+#   curl -s -X POST http://localhost:3030/api/books \
+#     -H "Content-Type: application/json" \
+#     -H "Authorization: Bearer $TOKEN" \
+#     -d '{"title":"ทดสอบ","categoryId":1,"authorIds":[1]}'
+#
+# ลบหนังสือ (ต้องมี token):
+#   curl -s -X DELETE http://localhost:3030/api/books/<book-id> \
+#     -H "Authorization: Bearer $TOKEN"
